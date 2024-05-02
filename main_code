@@ -4,7 +4,7 @@
 #include <atomic>
 #include <mutex>
 #include <cstdlib>
-#include <conio.h> // Для функций _kbhit() и _getch() в Windows
+#include <conio.h> 
 
 using namespace std;
 
@@ -125,7 +125,7 @@ public:
             // Проверяем, была ли нажата клавиша
             if (_kbhit()) {
                 char input = _getch();
-                if (input == 'e' || input == 'E') { // Если нажата клавиша 'e' или 'E' для экстренной остановки
+                if (input == 'e' || input == 'E') {
                     if (running) {
                         stop();
                     }
