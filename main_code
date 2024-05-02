@@ -43,14 +43,13 @@ class ConveyorBelt {
     FillSensor& fillSensor;
     Container& primaryContainer;
     Container* secondaryContainer;
-    Container* tertiaryContainer;
     PrintSensor& printSensor;
     string name;
     mutex mtx;
 
 public:
-    ConveyorBelt(const string& n, FillSensor& fs, Container& pc, PrintSensor& ps, Container* sc = nullptr, Container* tc = nullptr) :
-        name(n), fillSensor(fs), primaryContainer(pc), secondaryContainer(sc), tertiaryContainer(tc), printSensor(ps) {
+    ConveyorBelt(const string& n, FillSensor& fs, Container& pc, PrintSensor& ps, Container* sc = nullptr) :
+        name(n), fillSensor(fs), primaryContainer(pc), secondaryContainer(sc), printSensor(ps) {
         running = false;
     }
 
@@ -59,7 +58,6 @@ public:
         running = true;
         cout << "Конвейерная лента " << name << " запущена." << endl;
         cout << "Крышки контейнеров с заготовками открыты " << endl;
-
     }
 
     void stop() {
@@ -83,11 +81,8 @@ public:
         else if (secondaryContainer && secondaryContainer->getCount() > 0) {
             secondaryContainer->decreaseCount();
         }
-        else if (tertiaryContainer && tertiaryContainer->getCount() > 0) {
-            tertiaryContainer->decreaseCount();
-        }
 
-        int totalCount = primaryContainer.getCount() + (secondaryContainer ? secondaryContainer->getCount() : 0) + (tertiaryContainer ? tertiaryContainer->getCount() : 0);
+        int totalCount = primaryContainer.getCount() + (secondaryContainer ? secondaryContainer->getCount() : 0);
         cout << "Осталось заготовок в контейнерах: " << totalCount << endl;
 
         printSensor.reset();
@@ -101,7 +96,7 @@ public:
             cout << "Заготовка движется по конвейеру " << name << "..." << endl;
             this_thread::sleep_for(chrono::seconds(1));
 
-            int totalCount = primaryContainer.getCount() + (secondaryContainer ? secondaryContainer->getCount() : 0) + (tertiaryContainer ? tertiaryContainer->getCount() : 0);
+            int totalCount = primaryContainer.getCount() + (secondaryContainer ? secondaryContainer->getCount() : 0);
             if (totalCount == 0) {
                 cout << "Все контейнеры пусты." << endl;
                 stop();
@@ -117,9 +112,7 @@ public:
                 else if (secondaryContainer && secondaryContainer->getCount() > 0) {
                     secondaryContainer->decreaseCount();
                 }
-                else if (tertiaryContainer && tertiaryContainer->getCount() > 0) {
-                    tertiaryContainer->decreaseCount();
-                }cout << "Заготовка достигла финального контейнера." << endl;
+                cout << "Заготовка достигла финального контейнера." << endl;
             }
 
             // Проверяем, была ли нажата клавиша
@@ -142,19 +135,19 @@ int main() {
     setlocale(LC_ALL, "Russian");
     FillSensor fillSensor1, fillSensor2;
     PrintSensor printSensor1, printSensor2;
-    Container container1(5), container2(5), container3(2), container4(3);
+    Container container1(5), container2(5), container3(2);
 
     ConveyorBelt conveyor1("A", fillSensor1, container1, printSensor1, &container3);
-    ConveyorBelt conveyor2("B", fillSensor2, container2, printSensor2, &container3, &container4);
+    ConveyorBelt conveyor2("B", fillSensor2, container2, printSensor2, &container3);
 
     char input;
     cout << "Нажмите 's' для запуска процесса или 'q' для выхода: ";
+
     cin >> input;
 
     if (input == 's') {
         conveyor1.start();
         conveyor2.start();
-
 
         thread t1(&ConveyorBelt::run, &conveyor1);
         thread t2(&ConveyorBelt::run, &conveyor2);
