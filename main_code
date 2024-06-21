@@ -48,6 +48,7 @@ class ConveyorBelt {
     mutex mtx;
 
 public:
+
     ConveyorBelt(const string& n, FillSensor& fs, Container& pc, PrintSensor& ps, Container* sc = nullptr) :
         name(n), fillSensor(fs), primaryContainer(pc), secondaryContainer(sc), printSensor(ps) {
         running = false;
@@ -72,7 +73,7 @@ public:
         mtx.lock();
         system("cls");
         cout << "Заготовка на конвейере " << name << " проходит станок печати..." << endl;
-        this_thread::sleep_for(chrono::seconds(2));
+        this_thread::sleep_for(chrono::seconds(4));
         cout << "Печать заготовки на конвейере " << name << " завершена." << endl;
 
         if (primaryContainer.getCount() > 0) {
@@ -115,7 +116,7 @@ public:
                 cout << "Заготовка достигла финального контейнера." << endl;
             }
 
-            // Проверяем, была ли нажата клавиша
+
             if (_kbhit()) {
                 char input = _getch();
                 if (input == 'e' || input == 'E') {
@@ -141,7 +142,11 @@ int main() {
     ConveyorBelt conveyor2("B", fillSensor2, container2, printSensor2, &container3);
 
     char input;
-    cout << "Нажмите 's' для запуска процесса или 'q' для выхода: ";
+    cout << "=========================================================" << endl;
+    cout << "|  Нажмите 's' для запуска процесса или 'q' для выхода: |" << endl;
+    cout << "=========================================================" << endl;
+    cout << "Инструкция по эксплуатации:Нажмите клавишу s для запуска программы, для экстренной остановки нажмите клавишу e" << endl;
+
 
     cin >> input;
 
@@ -156,10 +161,14 @@ int main() {
         t2.join();
 
         cout << "Процесс завершен." << endl;
+        system("cls");
+        cout << "Для повторного запуска конвейера:" << endl;
+;
     }
     else {
         cout << "Процесс не запущен." << endl;
     }
+    main();
 
     return 0;
 }
